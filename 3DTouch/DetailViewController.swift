@@ -11,7 +11,7 @@ import UIKit
 class DetailViewController: UIViewController {
     
     // MARK: - Properties
-
+    
     var item: (title: String, detail: String)?  {
         didSet {
             print("item didSet")
@@ -37,6 +37,40 @@ class DetailViewController: UIViewController {
         }
     }
     
+    // MARK: - Preview Action
+    weak var fromViewController: ViewController?
+    var itemIndex = 0
+
+    override var previewActionItems: [UIPreviewActionItem] {
+        
+        // default style
+        let show = UIPreviewAction(title: "Show", style: .default) { (action, viewController) in
+            guard let sourceVC = self.fromViewController,
+                let desVC = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController else {
+                    return
+            }
+            desVC.fromViewController = sourceVC
+            desVC.item = self.item
+            desVC.itemIndex = self.itemIndex
+            
+            sourceVC.show(desVC, sender: nil)
+        }
+        
+        // selected style
+        let check = UIPreviewAction(title: "selected", style: .selected) { (action, viewController) in
+            
+        }
+        
+        // delete style
+        let delete = UIPreviewAction(title: "Delete", style: .destructive) { (action, viewController) in
+            guard let sourceVC = self.fromViewController else { return }
+            sourceVC.items.remove(at: self.itemIndex)
+            sourceVC.tableView.reloadData()
+        }
+        
+        return [show, check, delete]
+    }
+    
     // MARK: - View controller lifecycle
     
     override func viewDidLoad() {
@@ -59,6 +93,6 @@ class DetailViewController: UIViewController {
         print("viewDidAppear")
         print("----------------------------------")
     }
-
+    
 }
 

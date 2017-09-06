@@ -10,7 +10,9 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    fileprivate let items = [
+    // MARK: - Properties
+    
+    var items = [
     ("A", "$30"),
     ("B", "$40"),
     ("C", "$50"),
@@ -25,6 +27,7 @@ class ViewController: UIViewController {
         }
     }
     
+    // MARK: - View controller lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,7 +35,7 @@ class ViewController: UIViewController {
     }
     
     
-    // Register  for previewing  .... 3D touch
+    // MARK: - Register  for previewing  .... 3D touch
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         switch traitCollection.forceTouchCapability {
@@ -46,7 +49,7 @@ class ViewController: UIViewController {
         }
     }
     
-    // Navigation
+    // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "to detail",
@@ -96,8 +99,13 @@ extension ViewController: UIViewControllerPreviewingDelegate {
             return nil
         }
         
+        // for peek & pop
         detailVC.item = items[indexPath.row]
         previewingContext.sourceRect = cell.frame
+        
+        // for preview action
+        detailVC.fromViewController = self
+        detailVC.itemIndex = indexPath.row
 
         return detailVC
     }
