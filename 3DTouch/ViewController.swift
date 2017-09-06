@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  3DTouch
 //
-//  Created by nyato on 2017/9/6.
-//  Copyright © 2017年 nyato. All rights reserved.
+//  Created by ju on 2017/9/6.
+//  Copyright © 2017年 ju. All rights reserved.
 //
 // Static shortcuts, set in info.plist, key as UIApplicationShortcutItems
 // Dynamic shortcuts
