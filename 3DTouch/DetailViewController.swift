@@ -12,10 +12,11 @@ class DetailViewController: UIViewController {
     
     // MARK: - Properties
     
-    var item: (title: String, detail: String)?  {
+    // for dynamic shortcuts
+    var share = false
+    
+    var item: TableItem?  {
         didSet {
-            print("item didSet")
-
             titleLabel?.text = item?.title
             detailLabel?.text = item?.detail
         }
@@ -23,23 +24,18 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel! {
         didSet {
-            print("titleLabel didSet")
-            
             titleLabel.text = item?.title
         }
     }
 
     @IBOutlet weak var detailLabel: UILabel! {
         didSet {
-            print("detailLabel didSet")
-
             detailLabel.text = item?.detail
         }
     }
     
     // MARK: - Preview Action
     weak var fromViewController: ViewController?
-    var itemIndex = 0
 
     override var previewActionItems: [UIPreviewActionItem] {
         
@@ -49,9 +45,9 @@ class DetailViewController: UIViewController {
                 let desVC = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController else {
                     return
             }
+            
             desVC.fromViewController = sourceVC
             desVC.item = self.item
-            desVC.itemIndex = self.itemIndex
             
             sourceVC.show(desVC, sender: nil)
         }
@@ -63,8 +59,9 @@ class DetailViewController: UIViewController {
         
         // delete style
         let delete = UIPreviewAction(title: "Delete", style: .destructive) { (action, viewController) in
-            guard let sourceVC = self.fromViewController else { return }
-            sourceVC.items.remove(at: self.itemIndex)
+            guard let sourceVC = self.fromViewController,
+                let item = self.item else { return }
+            TableItem.delete(item: item)
             sourceVC.tableView.reloadData()
         }
         
@@ -75,23 +72,27 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("----------------------------------")
-        print("viewDidLoad")
-        
         title = "Content"
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        print("viewWillAppear")
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        print("viewDidAppear")
-        print("----------------------------------")
+        if share {
+            shareContent(self)
+        }
+    }
+    
+    // MARK: - Share 
+    private var activityViewController: UIActivityViewController? {
+        guard let item = item else { return nil }
+        return UIActivityViewController(activityItems: [item.title, item.detail], applicationActivities: nil)
+    }
+    
+    @IBAction func shareContent(_ sender: Any) {
+        if let activityViewController = activityViewController {
+            present(activityViewController, animated: true, completion: nil)
+        }
     }
     
 }

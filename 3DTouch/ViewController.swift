@@ -5,19 +5,17 @@
 //  Created by nyato on 2017/9/6.
 //  Copyright © 2017年 nyato. All rights reserved.
 //
+// Static shortcuts, set in info.plist, key as UIApplicationShortcutItems
+// Dynamic shortcuts
+//
+//
+//
 
 import UIKit
 
 class ViewController: UIViewController {
     
     // MARK: - Properties
-    
-    var items = [
-    ("A", "$30"),
-    ("B", "$40"),
-    ("C", "$50"),
-    ("D", "$60"),
-    ("E", "$70")]
 
     @IBOutlet weak var tableView: UITableView! {
         didSet {
@@ -34,8 +32,19 @@ class ViewController: UIViewController {
         title = "3D Touch"
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        tableView.reloadData()
+    }
+
     
-    // MARK: - Register  for previewing  .... 3D touch
+    // MARK: - Helper
+    @IBAction func newAction(_ sender: Any) {
+        performSegue(withIdentifier: "new", sender: nil)
+    }
+        
+    // MARK: - Register 3D touch
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         switch traitCollection.forceTouchCapability {
@@ -55,8 +64,14 @@ class ViewController: UIViewController {
         if segue.identifier == "to detail",
             let desvc = segue.destination as? DetailViewController,
             let indexPath = sender as? IndexPath {
-            desvc.item = items[indexPath.row]
+            desvc.item = TableItem.all[indexPath.row]
         }
+        
+        if segue.identifier == "new",
+            let desvc = segue.destination.targetViewController as? NewViewController {
+            desvc.delegate = self
+        }
+        
     }
 }
 
@@ -64,14 +79,14 @@ class ViewController: UIViewController {
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return TableItem.all.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let item = items[indexPath.row]
-        cell.textLabel?.text = item.0
-        cell.detailTextLabel?.text = item.1
+        let item = TableItem.all[indexPath.row]
+        cell.textLabel?.text = item.title
+        cell.detailTextLabel?.text = item.detail
 
         return cell
     }
@@ -80,6 +95,14 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         performSegue(withIdentifier: "to detail", sender: indexPath)
+    }
+    
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            TableItem.delete(at: indexPath.row)
+            tableView.reloadData()
+        }
     }
 }
 
@@ -100,12 +123,11 @@ extension ViewController: UIViewControllerPreviewingDelegate {
         }
         
         // for peek & pop
-        detailVC.item = items[indexPath.row]
+        detailVC.item = TableItem.all[indexPath.row]
         previewingContext.sourceRect = cell.frame
         
         // for preview action
         detailVC.fromViewController = self
-        detailVC.itemIndex = indexPath.row
 
         return detailVC
     }
@@ -114,6 +136,28 @@ extension ViewController: UIViewControllerPreviewingDelegate {
         print("viewControllerToCommit")
 
         show(viewControllerToCommit, sender: self)
+    }
+}
+
+
+//MARK: - Add new item
+extension ViewController: NewViewControllerDelegate {
+    func newViewController(newViewController: NewViewController, with newItem: TableItem) {
+        TableItem.add(item: newItem)
+    }
+}
+
+
+// MARK: - Get segue's destination view controller
+
+extension UIViewController {
+    
+    var targetViewController: UIViewController {
+        if let navc = self as? UINavigationController {
+            return navc.visibleViewController ?? self
+        } else {
+            return self
+        }
     }
 }
 
