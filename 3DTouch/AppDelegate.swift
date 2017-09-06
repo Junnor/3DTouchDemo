@@ -34,15 +34,16 @@ extension AppDelegate {
     
     private func handleShortcutItem(shortcutItem: UIApplicationShortcutItem) {
         switch shortcutItem.type {
-        case "com.ju.demo.add":
+        case "com.ju.demo.add":   // static
             addNewOne()
-            case "com.ju.demo.share":
+            case "com.ju.demo.share":    // dynamic
             share()
         default:
             break
         }
     }
     
+    // static method
     private func addNewOne() {
         if let newvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "NewViewController") as? NewViewController,
             let rootVC = window?.rootViewController?.targetViewController as? ViewController {
@@ -52,6 +53,7 @@ extension AppDelegate {
         }
     }
     
+    // dynamic method
     private func share() {
         if let item = TableItem.all.first,
             let detailVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController,

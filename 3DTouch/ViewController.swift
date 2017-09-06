@@ -44,7 +44,7 @@ class ViewController: UIViewController {
         performSegue(withIdentifier: "new", sender: nil)
     }
         
-    // MARK: - Register 3D touch
+    // MARK: - Register for 3D touch
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         switch traitCollection.forceTouchCapability {
